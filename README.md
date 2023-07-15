@@ -1,13 +1,20 @@
-# Sample Hardhat Project
+# Crowdsale
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+## Overview
 
-Try running some of the following tasks:
+This is a crowdsale contract for Snarfcoin on the [Ethereum](https://www.ethereum.org/) blockchain.
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
+## Requirements
+
+* [Node.js](https://nodejs.org/en/) >= 8.9.4
+* [Hardhat](https://hardhat.org/) >= 2.0.0
+
+## Installation
+
+```bash
+npm install
 ```
+
+## Creator
+
+* [snarfgod](https://github.com/snarfgod)
