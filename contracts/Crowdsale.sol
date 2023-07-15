@@ -13,6 +13,7 @@ contract Crowdsale {
 
     event Buy(uint256 amount, address buyer);
     event Finalize(uint256 tokensSold, uint256 ethRaised);
+    event PriceChange(uint256 price);
 
     // Need code and address from token.sol file
 
@@ -40,6 +41,11 @@ contract Crowdsale {
         require(token.transfer(msg.sender, _amount));
         tokensSold += _amount;
         emit Buy(_amount, msg.sender);
+    }
+
+    function setPrice(uint256 _price) public onlyOwner {
+        price = _price;
+        emit PriceChange(_price);
     }
 
      //finalize the sale of the token by sending Eth and tokens from the contract to the deployer
