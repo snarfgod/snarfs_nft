@@ -13,7 +13,7 @@ describe('Crowdsale', async () => {
         const Crowdsale = await ethers.getContractFactory('Crowdsale')
         const Token = await ethers.getContractFactory('Token')   
         //Deploy token contract   
-        token = await Token.deploy('Snarfcoin', 'SNARF', '1000000000000000000000000')
+        token = await Token.deploy('Snarfcoin', 'SNARF', '1000000')
         //Get accounts
         accounts = await ethers.getSigners()
         deployer = accounts[0]

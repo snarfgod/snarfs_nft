@@ -26,10 +26,6 @@ async function main() {
     const transaction = await token.transfer(crowdsale.address, ethers.utils.parseUnits('1000000', 'ether'));
     await transaction.wait();
     console.log("Transfered tokens to crowdsale");
-
-    console.log(await token.balanceOf(crowdsale.address));
-    console.log(transaction);
-    console.log(await token.balanceOf(token.address));
 }
 
 // We recommend this pattern to be able to use async/await everywhere
