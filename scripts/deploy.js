@@ -7,10 +7,10 @@
 const hre = require("hardhat");
 
 async function main() {
-    const NAME = 'Snarfcoin'
-    const SYMBOL = 'SNARF'
-    const MAX_SUPPLY = '1000000000000000000000000'
-    const PRICE = ethers.utils.parseUnits('.025', 'ether')
+    const NAME = 'Snarfcoin';
+    const SYMBOL = 'SNARF';
+    const MAX_SUPPLY = ethers.utils.parseUnits('1000000', 'ether');
+    const PRICE = ethers.utils.parseUnits('.025', 'ether');
     
     const Token = await hre.ethers.getContractFactory("Token");
     let token = await Token.deploy(NAME, SYMBOL, MAX_SUPPLY);
@@ -19,11 +19,11 @@ async function main() {
     console.log("Token deployed to:", token.address);
 
     const Crowdsale = await hre.ethers.getContractFactory("Crowdsale");
-    let crowdsale = await Crowdsale.deploy(token.address, PRICE, ethers.utils.parseUnits(MAX_SUPPLY, 'ether'));
+    let crowdsale = await Crowdsale.deploy(token.address, PRICE, MAX_SUPPLY);
     await crowdsale.deployed();
     console.log("Crowdsale deployed to:", crowdsale.address);
 
-    const transaction = await token.transfer(crowdsale.address, ethers.utils.parseUnits('1000000', 'ether'));
+    const transaction = await token.transfer(crowdsale.address, MAX_SUPPLY);
     await transaction.wait();
     console.log("Transfered tokens to crowdsale");
 }

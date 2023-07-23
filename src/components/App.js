@@ -62,6 +62,14 @@ function App() {
     return(
         <Container>
             <Navigation />
+            
+            <h1>
+                <p className='text-center my-5'>
+                <strong>Introducing Snarfcoin!</strong>
+                </p>
+            </h1>
+
+            
             {isLoading ? (
                 <Loading />
             ):(
