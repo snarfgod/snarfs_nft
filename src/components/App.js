@@ -6,6 +6,7 @@ import {useEffect, useState} from 'react';
 import Navigation from './Navigation';
 import Info from './Info';
 import Loading from './Loading';
+import Buy from './Buy';
 
 //ABIs
 import TOKEN_ABI from '../abis/Token.json';
@@ -62,7 +63,7 @@ function App() {
     return(
         <Container>
             <Navigation />
-            
+
             <h1>
                 <p className='text-center my-5'>
                 <strong>Introducing Snarfcoin!</strong>
@@ -77,6 +78,9 @@ function App() {
                 <p className='text-center'>
                     <strong>Price= </strong>{price} ETH
                 </p>
+
+                <Buy provider={provider} price={price} crowdsale={crowdsale} setIsLoading={setIsLoading} />
+
                 <p className='text-center my-3'>
                     {tokensSold} / {maxTokens} Tokens Sold
                 </p>
