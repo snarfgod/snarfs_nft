@@ -7,6 +7,7 @@ import Navigation from './Navigation';
 import Info from './Info';
 import Loading from './Loading';
 import Buy from './Buy';
+import Progress from './Progress';
 
 //ABIs
 import TOKEN_ABI from '../abis/Token.json';
@@ -49,7 +50,6 @@ function App() {
         setMaxTokens(maxTokens)
         const tokensSold = ethers.utils.formatUnits(await crowdsale.tokensSold(), 18)
         setTokensSold(tokensSold)
-        console.log(maxTokens)
         setAccount(account)      
         setIsLoading(false)  
     }
@@ -80,6 +80,10 @@ function App() {
                 </p>
 
                 <Buy provider={provider} price={price} crowdsale={crowdsale} setIsLoading={setIsLoading} />
+
+                <p className='text-center my-3'>
+                    <Progress tokensSold={tokensSold} maxTokens={maxTokens}/>
+                </p>
 
                 <p className='text-center my-3'>
                     {tokensSold} / {maxTokens} Tokens Sold
