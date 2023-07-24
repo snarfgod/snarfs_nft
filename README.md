@@ -35,9 +35,9 @@ npx hardhat run scripts/deploy.js --network localhost
 
 3. Run the frontend
 
-```bash
-node App.js
-```
+Navigate to shy-cake-6487.on.fleek.co and connect your wallet to the site.
+
+4. Buy tokens!
 
 ## Creator
 
