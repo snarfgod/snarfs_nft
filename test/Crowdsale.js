@@ -8,11 +8,14 @@ const ether = tokens
 describe('Crowdsale', async () => {
     let crowdsale, token, accounts, deployer, user1
     let name, symbol, max_supply
+    let startTime, endTime
 
     beforeEach(async () => {
         name = 'Snarfcoin'
         symbol = 'SNARF'
         max_supply = ethers.utils.parseUnits('1000000', 'ether')
+        startTime = (await ethers.provider.getBlock('latest')).timestamp + 5
+        endTime = (await ethers.provider.getBlock('latest')).timestamp + 999999999
         //Load contracts
         const Crowdsale = await ethers.getContractFactory('Crowdsale')
         const Token = await ethers.getContractFactory('Token')   
@@ -23,7 +26,7 @@ describe('Crowdsale', async () => {
         deployer = accounts[0]
         user1 = accounts[1]
         //Deploy crowdsale contract
-        crowdsale = await Crowdsale.deploy(token.address, ether(1), max_supply)
+        crowdsale = await Crowdsale.deploy(token.address, ether(1), max_supply, startTime, endTime)
         //Send tokens to crowdsale contract
         let transaction = await token.connect(deployer).transfer(crowdsale.address, max_supply)
         await transaction.wait()
@@ -167,7 +170,7 @@ describe('Crowdsale', async () => {
     })
     describe('Whitelist', () => {
         let amount = tokens(10)
-        
+
         describe('Success', async () => {
             
 
@@ -178,11 +181,12 @@ describe('Crowdsale', async () => {
             it('adds user to whitelist', async () => {            
                 expect(await crowdsale.whitelist(user1.address)).to.equal(true)
             })
-            it('allows whitelisted users to buy tokens', async () => {
+            it('allows whitelisted users to buy tokens during sale', async () => {
                 const transaction = await crowdsale.connect(user1).buyTokens(amount, {value: ether(10)})
                 const result = await transaction.wait()
                 expect(transaction).to.emit(crowdsale, 'Buy').withArgs(amount, user1.address)
             })
+
         })
 
         describe('Failure', async () => {
@@ -190,6 +194,13 @@ describe('Crowdsale', async () => {
                 await expect(crowdsale.connect(user1).addToWhitelist(user1.address)).to.be.reverted
             })
             it('prevents purchases from nonwhitelisted addresses', async () => {
+                await expect(crowdsale.connect(user1).buyTokens(amount, {value: ether(10)})).to.be.reverted
+            })
+            it('prevents purchases outside of the sale', async () => {
+                await ethers.provider.send('evm_setNextBlockTimestamp', [(await ethers.provider.getBlock('latest')).timestamp + 1000000000000000]);
+                await ethers.provider.send('evm_mine');
+
+                await crowdsale.connect(deployer).addToWhitelist(user1.address)
                 await expect(crowdsale.connect(user1).buyTokens(amount, {value: ether(10)})).to.be.reverted
             })
         })

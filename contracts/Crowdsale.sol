@@ -10,6 +10,8 @@ contract Crowdsale {
     uint256 public tokensSold;
     uint256 public maxTokens;
     address public owner;
+    uint256 public startTime;
+    uint256 public endTime;
     
     mapping(address => bool) public whitelist;
 
@@ -19,12 +21,13 @@ contract Crowdsale {
 
     // Need code and address from token.sol file
 
-    constructor(Token _token, uint256 _price, uint256 _maxTokens) {
+    constructor(Token _token, uint256 _price, uint256 _maxTokens, uint256 _startTime, uint256 _endTime) {
         owner = msg.sender;
         token = _token;
         price = _price;
         maxTokens = _maxTokens;
-
+        startTime = _startTime;
+        endTime = _endTime;
     }
 
     modifier onlyOwner () {
@@ -38,6 +41,7 @@ contract Crowdsale {
     }
 
     receive() external payable {
+        require(startTime <= block.timestamp && block.timestamp <= endTime, 'Sale is not active');
         uint256 amount = msg.value / price;
         buyTokens(amount * 1e18);
     }
@@ -50,6 +54,7 @@ contract Crowdsale {
         require(msg.value == (_amount / 1e18) * price);
         require(token.balanceOf(address(this)) >= _amount);
         require(token.transfer(msg.sender, _amount));
+        require(startTime <= block.timestamp && block.timestamp <= endTime, 'Sale is not active');
         tokensSold += _amount;
         emit Buy(_amount, msg.sender);
     }
