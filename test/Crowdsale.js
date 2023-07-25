@@ -7,21 +7,25 @@ const tokens = (n) => {
 const ether = tokens
 describe('Crowdsale', async () => {
     let crowdsale, token, accounts, deployer, user1
+    let name, symbol, max_supply
 
     beforeEach(async () => {
+        name = 'Snarfcoin'
+        symbol = 'SNARF'
+        max_supply = ethers.utils.parseUnits('1000000', 'ether')
         //Load contracts
         const Crowdsale = await ethers.getContractFactory('Crowdsale')
         const Token = await ethers.getContractFactory('Token')   
         //Deploy token contract   
-        token = await Token.deploy('Snarfcoin', 'SNARF', '1000000')
+        token = await Token.deploy(name, symbol, max_supply)
         //Get accounts
         accounts = await ethers.getSigners()
         deployer = accounts[0]
         user1 = accounts[1]
         //Deploy crowdsale contract
-        crowdsale = await Crowdsale.deploy(token.address, ether(1), '1000000')
+        crowdsale = await Crowdsale.deploy(token.address, ether(1), max_supply)
         //Send tokens to crowdsale contract
-        let transaction = await token.connect(deployer).transfer(crowdsale.address, tokens(1000000))
+        let transaction = await token.connect(deployer).transfer(crowdsale.address, max_supply)
         await transaction.wait()
     })
     describe('Deployment', () => {
@@ -36,12 +40,13 @@ describe('Crowdsale', async () => {
             expect(await crowdsale.price()).to.equal(ether(1))
         })
         it('sets maxTokens', async () => {
-            expect(await crowdsale.maxTokens()).to.equal('1000000')
+            expect(await crowdsale.maxTokens()).to.equal(max_supply)
         })
         it('sets owner', async () => {
             expect(await crowdsale.owner()).to.equal(deployer.address)
         })
-    })
+    }) 
+    
     describe('Buying tokens', () => {
         let amount = tokens(10)
         let transaction, result
@@ -150,4 +155,24 @@ describe('Crowdsale', async () => {
             })
         })
     })
+    describe('Whitelist', () => {
+        
+        describe('Success', async () => {
+
+            beforeEach(async () => {
+                await crowdsale.connect(deployer).addToWhitelist(user1.address)
+            })
+
+            it('adds user to whitelist', async () => {            
+                expect(await crowdsale.whitelist(user1.address)).to.equal(true)
+            })
+        })
+
+        describe('Failure', async () => {
+            it('only allows owner to add users to whitelist', async () => {
+                await expect(crowdsale.connect(user1).addToWhitelist(user1.address)).to.be.reverted
+            })
+        })
+        
+    })  
 })
