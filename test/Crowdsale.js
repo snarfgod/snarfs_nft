@@ -53,8 +53,10 @@ describe('Crowdsale', async () => {
         describe('Success', async () => {
 
             beforeEach(async () => {
+                await crowdsale.connect(deployer).addToWhitelist(user1.address)
                 transaction = await crowdsale.connect(user1).buyTokens(amount, {value: ether(10)})
                 result = await transaction.wait()
+
             })
             it('transfers tokens', async () => {
                 expect(await token.balanceOf(crowdsale.address)).to.equal(tokens(999990))
@@ -71,12 +73,16 @@ describe('Crowdsale', async () => {
             })
         })
         describe('Failure', async () => {
+
+            beforeEach(async () => {
+                await crowdsale.connect(deployer).addToWhitelist(user1.address)
+            })
             
             it('rejects incorrect purchase amount', async () => {
                 await expect(crowdsale.connect(user1).buyTokens(amount, {value: ether(0)})).to.be.reverted
             })
             it('rejects when more than what contract contains', async () => {
-                await expect(crowdsale.connect(user1).buyTokens(tokens(100000000), {value: ether(1)})).to.be.reverted
+                await expect(crowdsale.connect(user1).buyTokens(tokens(100000000000), {value: ether(1)})).to.be.reverted
             })
         
 
@@ -87,6 +93,7 @@ describe('Crowdsale', async () => {
         let transaction, result
 
         beforeEach(async () => {
+            await crowdsale.connect(deployer).addToWhitelist(user1.address)
             transaction = await user1.sendTransaction({to:crowdsale.address, value:amount})
             result = await transaction.wait()
         })
@@ -128,6 +135,8 @@ describe('Crowdsale', async () => {
 
         describe('Success', async () => {
             beforeEach(async () => {
+                await crowdsale.connect(deployer).addToWhitelist(user1.address)
+
                 transaction = await crowdsale.connect(user1).buyTokens(amount, {value: value})
                 result = await transaction.wait()
 
@@ -147,6 +156,7 @@ describe('Crowdsale', async () => {
         })
         describe('Failure', async () => {
             beforeEach(async () => {
+                await crowdsale.connect(deployer).addToWhitelist(user1.address)
                 transaction = await crowdsale.connect(user1).buyTokens(amount, {value: value})
                 result = await transaction.wait()
             })
@@ -156,8 +166,10 @@ describe('Crowdsale', async () => {
         })
     })
     describe('Whitelist', () => {
+        let amount = tokens(10)
         
         describe('Success', async () => {
+            
 
             beforeEach(async () => {
                 await crowdsale.connect(deployer).addToWhitelist(user1.address)
@@ -166,11 +178,19 @@ describe('Crowdsale', async () => {
             it('adds user to whitelist', async () => {            
                 expect(await crowdsale.whitelist(user1.address)).to.equal(true)
             })
+            it('allows whitelisted users to buy tokens', async () => {
+                const transaction = await crowdsale.connect(user1).buyTokens(amount, {value: ether(10)})
+                const result = await transaction.wait()
+                expect(transaction).to.emit(crowdsale, 'Buy').withArgs(amount, user1.address)
+            })
         })
 
         describe('Failure', async () => {
             it('only allows owner to add users to whitelist', async () => {
                 await expect(crowdsale.connect(user1).addToWhitelist(user1.address)).to.be.reverted
+            })
+            it('prevents purchases from nonwhitelisted addresses', async () => {
+                await expect(crowdsale.connect(user1).buyTokens(amount, {value: ether(10)})).to.be.reverted
             })
         })
         
