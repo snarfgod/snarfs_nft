@@ -12,6 +12,9 @@ contract Crowdsale {
     address public owner;
     uint256 public startTime;
     uint256 public endTime;
+    uint256 public minPurchase = 1e18;
+    uint256 public maxPurchase = 10000e18;
+
     
     mapping(address => bool) public whitelist;
 
@@ -53,6 +56,7 @@ contract Crowdsale {
     function buyTokens(uint256 _amount) public payable isWhitelisted {
         require(msg.value == (_amount / 1e18) * price);
         require(token.balanceOf(address(this)) >= _amount);
+        require(_amount >= minPurchase && _amount <= maxPurchase , 'You must buy at least 1 token, but no more than 10000');
         require(token.transfer(msg.sender, _amount));
         require(startTime <= block.timestamp && block.timestamp <= endTime, 'Sale is not active');
         tokensSold += _amount;

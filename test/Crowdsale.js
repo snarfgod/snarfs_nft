@@ -9,6 +9,8 @@ describe('Crowdsale', async () => {
     let crowdsale, token, accounts, deployer, user1
     let name, symbol, max_supply
     let startTime, endTime
+    let minPurchase, maxPurchase
+    
 
     beforeEach(async () => {
         name = 'Snarfcoin'
@@ -16,6 +18,8 @@ describe('Crowdsale', async () => {
         max_supply = ethers.utils.parseUnits('1000000', 'ether')
         startTime = (await ethers.provider.getBlock('latest')).timestamp + 5
         endTime = (await ethers.provider.getBlock('latest')).timestamp + 999999999
+        minPurchase = 1;
+        maxPurchase = 10000;
         //Load contracts
         const Crowdsale = await ethers.getContractFactory('Crowdsale')
         const Token = await ethers.getContractFactory('Token')   
@@ -48,6 +52,12 @@ describe('Crowdsale', async () => {
         it('sets owner', async () => {
             expect(await crowdsale.owner()).to.equal(deployer.address)
         })
+        it('sets start time', async () => {
+            expect(await crowdsale.startTime()).to.equal(startTime)
+        })
+        it('sets end time', async () => {
+            expect(await crowdsale.endTime()).to.equal(endTime)
+        })
     }) 
     
     describe('Buying tokens', () => {
@@ -59,7 +69,6 @@ describe('Crowdsale', async () => {
                 await crowdsale.connect(deployer).addToWhitelist(user1.address)
                 transaction = await crowdsale.connect(user1).buyTokens(amount, {value: ether(10)})
                 result = await transaction.wait()
-
             })
             it('transfers tokens', async () => {
                 expect(await token.balanceOf(crowdsale.address)).to.equal(tokens(999990))
@@ -74,6 +83,7 @@ describe('Crowdsale', async () => {
             it('emits a buy event', async () => {
                 expect(transaction).to.emit(crowdsale, 'Buy').withArgs(amount, user1.address)
             })
+
         })
         describe('Failure', async () => {
 
@@ -86,6 +96,12 @@ describe('Crowdsale', async () => {
             })
             it('rejects when more than what contract contains', async () => {
                 await expect(crowdsale.connect(user1).buyTokens(tokens(100000000000), {value: ether(1)})).to.be.reverted
+            })
+            it('rejects when outside of the purchase limits', async () => {
+                await expect(crowdsale.connect(user1).buyTokens(tokens(10001), {value: ether(1)})).to.be.reverted
+            })
+            it('rejects when buying less than 1 token', async () => {
+                await expect(crowdsale.connect(user1).buyTokens(tokens(0), {value: ether(1)})).to.be.reverted
             })
         
 
