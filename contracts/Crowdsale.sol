@@ -24,13 +24,13 @@ contract Crowdsale {
 
     // Need code and address from token.sol file
 
-    constructor(Token _token, uint256 _price, uint256 _maxTokens, uint256 _startTime, uint256 _endTime) {
+    constructor(Token _token, uint256 _price, uint256 _maxTokens) {
         owner = msg.sender;
         token = _token;
         price = _price;
         maxTokens = _maxTokens;
-        startTime = _startTime;
-        endTime = _endTime;
+        startTime = block.timestamp;
+        endTime = block.timestamp + 1555000;
     }
 
     modifier onlyOwner () {
@@ -43,7 +43,7 @@ contract Crowdsale {
         _;
     }
 
-    receive() external payable {
+    receive() external payable isWhitelisted {
         require(startTime <= block.timestamp && block.timestamp <= endTime, 'Sale is not active');
         uint256 amount = msg.value / price;
         buyTokens(amount * 1e18);
@@ -54,6 +54,9 @@ contract Crowdsale {
     }
 
     function buyTokens(uint256 _amount) public payable isWhitelisted {
+        require(_amount >= minPurchase, 'You must buy at least 1 token');
+        require(tokensSold + _amount <= maxTokens, 'Not enough tokens left for sale');
+        require(_amount <= maxPurchase, 'You cannot buy that many tokens at once');
         require(msg.value == (_amount / 1e18) * price);
         require(token.balanceOf(address(this)) >= _amount);
         require(_amount >= minPurchase && _amount <= maxPurchase , 'You must buy at least 1 token, but no more than 10000');

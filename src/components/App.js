@@ -8,6 +8,7 @@ import Info from './Info';
 import Loading from './Loading';
 import Buy from './Buy';
 import Progress from './Progress';
+import Time from './Time';
 
 //ABIs
 import TOKEN_ABI from '../abis/Token.json';
@@ -28,6 +29,10 @@ function App() {
     const [price, setPrice] = useState(null)
     const [maxTokens, setMaxTokens] = useState(null)
     const [tokensSold, setTokensSold] = useState(null)
+    const [startTime, setStartTime] = useState(0)
+    const [endTime, setEndTime] = useState(0)
+    const [startTimeDate, setStartTimeDate] = useState(null)
+    const [endTimeDate, setEndTimeDate] = useState(null)
 
     const loadBlockchainData = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -51,6 +56,18 @@ function App() {
         const tokensSold = ethers.utils.formatUnits(await crowdsale.tokensSold(), 18)
         setTokensSold(tokensSold)
         setAccount(account)      
+
+        const startTime = await crowdsale.startTime()
+        setStartTime(startTime)
+        const endTime = await crowdsale.endTime()
+        setEndTime(endTime)
+        
+        const startTimeDate = new Date(startTime * 1000); // Multiply by 1000 to convert from seconds to milliseconds
+        const endTimeDate = new Date(endTime * 1000);
+
+    // Set the state variables
+        setStartTimeDate(startTimeDate.toUTCString());
+        setEndTimeDate(endTimeDate.toUTCString());
         setIsLoading(false)  
     }
 
@@ -79,7 +96,10 @@ function App() {
                     <strong>Price= </strong>{price} ETH
                 </p>
 
+
                 <Buy provider={provider} price={price} crowdsale={crowdsale} setIsLoading={setIsLoading} />
+
+                <Time startTimeDate={startTimeDate} endTimeDate={endTimeDate} startTime={startTime} endTime={endTime}/>
 
                 <p className='text-center my-3'>
                     <Progress tokensSold={tokensSold} maxTokens={maxTokens}/>

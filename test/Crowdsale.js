@@ -16,10 +16,10 @@ describe('Crowdsale', async () => {
         name = 'Snarfcoin'
         symbol = 'SNARF'
         max_supply = ethers.utils.parseUnits('1000000', 'ether')
-        startTime = (await ethers.provider.getBlock('latest')).timestamp + 5
-        endTime = (await ethers.provider.getBlock('latest')).timestamp + 999999999
-        minPurchase = 1;
-        maxPurchase = 10000;
+        startTime = (await ethers.provider.getBlock('latest')).timestamp
+        endTime = (await ethers.provider.getBlock('latest')).timestamp + 1555000
+        minPurchase = tokens(1);
+        maxPurchase = tokens(10000);
         //Load contracts
         const Crowdsale = await ethers.getContractFactory('Crowdsale')
         const Token = await ethers.getContractFactory('Token')   
@@ -30,7 +30,7 @@ describe('Crowdsale', async () => {
         deployer = accounts[0]
         user1 = accounts[1]
         //Deploy crowdsale contract
-        crowdsale = await Crowdsale.deploy(token.address, ether(1), max_supply, startTime, endTime)
+        crowdsale = await Crowdsale.deploy(token.address, ether(1), max_supply)
         //Send tokens to crowdsale contract
         let transaction = await token.connect(deployer).transfer(crowdsale.address, max_supply)
         await transaction.wait()
@@ -53,10 +53,14 @@ describe('Crowdsale', async () => {
             expect(await crowdsale.owner()).to.equal(deployer.address)
         })
         it('sets start time', async () => {
-            expect(await crowdsale.startTime()).to.equal(startTime)
+            expect(await crowdsale.startTime()).to.equal(startTime + 2)
         })
         it('sets end time', async () => {
-            expect(await crowdsale.endTime()).to.equal(endTime)
+            expect(await crowdsale.endTime()).to.equal(endTime + 2)
+        })
+        it('sets min and max purchase amounts', async () => {
+            expect(await crowdsale.minPurchase()).to.equal(tokens(1))
+            expect(await crowdsale.maxPurchase()).to.equal(tokens(10000))
         })
     }) 
     

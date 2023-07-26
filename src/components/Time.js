@@ -1,10 +1,10 @@
 
-const Time = ({startTime, endTime}) => {
+const Time = ({startTimeDate, endTimeDate, startTime, endTime}) => {
     return(
         <div className = "text-center my-3">
-            <p><strong>Sale Begins: </strong>{startTime}</p>
-            <p><strong>Sale Ends: </strong>{endTime}</p>
-            <p><strong>Time remaining:</strong>{endTime-startTime}</p>
+            <p><strong>Sale Begins: </strong>{startTimeDate}</p>
+            <p><strong>Sale Ends: </strong>{endTimeDate}</p>
+            <p><strong>Time remaining:</strong>{(endTime-startTime)/60/60/24} days</p>
         </div>
     )
 }
