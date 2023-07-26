@@ -26,6 +26,12 @@ async function main() {
     const transaction = await token.transfer(crowdsale.address, MAX_SUPPLY);
     await transaction.wait();
     console.log("Transfered tokens to crowdsale");
+
+    const addingToWhitelist = await crowdsale.addToWhitelist('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266')
+    await addingToWhitelist.wait();
+    const addingOwner = await crowdsale.addToWhitelist('0x70997970C51812dc3A010C7d01b50e0d17dc79C8');
+    await addingOwner.wait()
+    console.log("Added deployer and user1 to whitelist");
 }
 
 // We recommend this pattern to be able to use async/await everywhere

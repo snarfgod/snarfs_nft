@@ -115,6 +115,7 @@ function App() {
             <hr />
             {account && (
                 <Info account={account} accountBalance={accountBalance}/>
+
             )}
             
         </Container>
