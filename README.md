@@ -4,6 +4,8 @@
 
 This is a crowdsale contract for Snarfcoin on the [Ethereum](https://www.ethereum.org/) blockchain.
 
+Note that only the first two accounts in hardhat will be able to purchase tokens upon deployment as they were the only addresses added to the whitelist upon deployment. To add more addresses to the whitelist, you can call the `addToWhitelist` function in the contract from the owner address. 
+
 ## Requirements
 
 * [Node.js](https://nodejs.org/en/) >= 8.9.4
