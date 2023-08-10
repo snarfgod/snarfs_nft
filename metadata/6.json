@@ -1,0 +1,38 @@
+{
+  "description": "",
+  "image": "ipfs://__CID__/d6857619b45d4ed87ad16920fb6f43243750344b.png",
+  "name": "",
+  "dna": "d6857619b45d4ed87ad16920fb6f43243750344b",
+  "uid": "6",
+  "generator": "HashLips Lab AE 2.0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "carolina_blue"
+    },
+    {
+      "trait_type": "Base",
+      "value": "base2"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "eyes5"
+    },
+    {
+      "trait_type": "Gorilla",
+      "value": "gorilla"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "hat4"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "mouth1"
+    },
+    {
+      "trait_type": "Shirt",
+      "value": "shirt3"
+    }
+  ]
+}
