@@ -11,6 +11,16 @@ This is an NFT contract for Snarfs on the [Ethereum](https://www.ethereum.org/) 
 * [React](https://reactjs.org/) >= 17.0.1
 * [Solidity](https://soliditylang.org/) >= 0.8.0
 
+## Usage
+
+```npm install```
+
+```npx hardhat node```
+
+```npx hardhat run scripts/deploy.js --network localhost```
+
+```npm run start```
+
 ## Creator
 
 * [snarfgod](https://github.com/snarfgod)
