@@ -113,7 +113,7 @@ function App() {
                   {Array.from({ length: balance }).map((_, index) => (
                     <div key={index} className='d-flex flex-column align-items-center'>
                       <img
-                        src={`https://gateway.pinata.cloud/ipfs/QmasBfFE6yQQH2y4SHfk5bTNm5iQiNSuMhyXxA9KuNd6Lk/${index+ 1}.png`}
+                        src={`https://gateway.pinata.cloud/ipfs/QmasBfFE6yQQH2y4SHfk5bTNm5iQiNSuMhyXxA9KuNd6Lk/${index+1}.png`}
                         alt=""
                         width="150px"
                         height="150px"
@@ -144,6 +144,7 @@ function App() {
               <Mint
                 provider={provider}
                 nft={nft}
+                balance={balance}
                 cost={cost}
                 setIsLoading={setIsLoading}
               />

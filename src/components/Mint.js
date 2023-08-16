@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 
-const Mint = ({ provider, nft, cost, setIsLoading }) => {
+const Mint = ({ provider, nft, balance, cost, setIsLoading }) => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [numNFTs, setNumNFTs] = useState(1);
 
@@ -21,6 +21,7 @@ const Mint = ({ provider, nft, cost, setIsLoading }) => {
       const totalCostWei = cost.mul(numNFTs); // Calculate the total cost in Wei
       const transaction = await nft.connect(signer).mint(numNFTs, { value: totalCostWei });
       await transaction.wait();
+      console.log(balance.toString());
     } catch (error) {
       console.error('Transaction error:', error);
       window.alert('User rejected or transaction reverted');
