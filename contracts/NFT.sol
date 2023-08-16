@@ -7,7 +7,7 @@ import "./Ownable.sol";
 contract NFT is ERC721Enumerable, Ownable {
 
     using Strings for uint256;
-
+    
     uint256 public cost;
     uint256 public maxSupply;
     uint256 public allowMintingOn;
