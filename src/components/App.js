@@ -98,7 +98,9 @@ function App() {
                     width="400px"
                     height="400px"
                   />
+                  <p className='text-center'><strong>#{balance.toString()}</strong></p>
                 </div>
+                
               ) : (
                 <img src={preview} alt="" width='300' height='300'/>
               )}

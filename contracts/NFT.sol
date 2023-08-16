@@ -41,7 +41,6 @@ contract NFT is ERC721Enumerable, Ownable {
         uint256 supply = totalSupply();
         require(supply + _mintAmount <= maxSupply);
 
-
         for(uint256 i = 1; i<= _mintAmount; i++) {
             _safeMint(msg.sender, supply + i);
         }
