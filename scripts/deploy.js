@@ -19,6 +19,10 @@ async function main() {
 
   await nft.deployed();
   console.log("NFT deployed to:", nft.address);
+
+  //Add Hardhat1 to the whitelist
+  await nft.addtoWhitelist('0x70997970C51812dc3A010C7d01b50e0d17dc79C8')
+  console.log("Hardhat1 added to whitelist");
 }
 
 // We recommend this pattern to be able to use async/await everywhere

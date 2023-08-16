@@ -13,10 +13,13 @@ contract NFT is ERC721Enumerable, Ownable {
     uint256 public allowMintingOn;
     string public baseURI;
     string public baseExtension = '.json';
+    bool public salePaused = false;
 
     event Mint(uint256 amount, address minter);
     event Withdraw(uint256 amount, address owner);
+    event SalePaused(bool paused);
 
+    mapping(address => bool) public whitelist;
 
     constructor(
         string memory _name,
@@ -32,7 +35,16 @@ contract NFT is ERC721Enumerable, Ownable {
         baseURI = _baseURI;
     }
 
-    function mint(uint256 _mintAmount) public payable {
+    modifier whenNotPaused() {
+        require(!salePaused, "Sale is paused");
+        _;
+    }
+    modifier isWhitelisted () {
+        require(whitelist[msg.sender], "You are not whitelisted.");
+        _;
+    }
+
+    function mint(uint256 _mintAmount) public payable whenNotPaused isWhitelisted {
 
         require(msg.value >= cost * _mintAmount);
         require(block.timestamp >= allowMintingOn);
@@ -56,6 +68,10 @@ contract NFT is ERC721Enumerable, Ownable {
         return(string(abi.encodePacked(baseURI, _tokenId.toString(), baseExtension)));
     }
 
+    function addtoWhitelist(address _user) public onlyOwner {
+        whitelist[_user] = true;
+    }
+
     function walletOfOwner(address _owner) public view returns(uint256[] memory) {
         uint256 ownerTokenCount = balanceOf(_owner);
         uint256[] memory tokenIds = new uint256[](ownerTokenCount);
@@ -77,7 +93,13 @@ contract NFT is ERC721Enumerable, Ownable {
         cost = _newCost;
     }
 
+    function pauseSale() public onlyOwner {
+        salePaused = true;
+        emit SalePaused(true);
+    }
+
+    function unpauseSale() public onlyOwner {
+        salePaused = false;
+        emit SalePaused(false);
+    }
 }
-
-
-

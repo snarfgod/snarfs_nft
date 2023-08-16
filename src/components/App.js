@@ -11,6 +11,7 @@ import Navigation from './Navigation';
 import Data from './Data';
 import Mint from './Mint';
 import Loading from './Loading';
+import Admin from './Admin';
 
 // ABIs: Import your contract ABIs here
 import NFT_ABI from '../abis/NFT.json'
@@ -29,6 +30,7 @@ function App() {
   const [totalSupply, setTotalSupply] = useState(0)
   const [cost, setCost] = useState(0)
   const [balance, setBalance] = useState(0)
+  const [owner, setOwner] = useState(null)
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -45,6 +47,10 @@ function App() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
     const account = ethers.utils.getAddress(accounts[0])
     setAccount(account)
+
+    // Fetch owner
+    const owner = await nft.owner()
+    setOwner(owner)
 
     // Fetch Countdown
     const allowMintingOn = await nft.allowMintingOn()
@@ -100,29 +106,27 @@ function App() {
                   height="400px"
                 />
                 <p className='text-center'><strong>#{balance.toString()}</strong></p>
-                <p className='text-center'>Most Recent Snarf Owned</p>
+                <p className='text-center'>Most Recent Snarf Purchased</p>
                 
                 {/* Display the rest of the owned NFTs side by side */}
                 <div className='d-flex mt-4'>
-                  {Array.from({ length: balance - 1 }).map((_, index) => (
+                  {Array.from({ length: balance }).map((_, index) => (
                     <div key={index} className='d-flex flex-column align-items-center'>
                       <img
-                        src={`https://gateway.pinata.cloud/ipfs/QmasBfFE6yQQH2y4SHfk5bTNm5iQiNSuMhyXxA9KuNd6Lk/${index + 1}.png`}
+                        src={`https://gateway.pinata.cloud/ipfs/QmasBfFE6yQQH2y4SHfk5bTNm5iQiNSuMhyXxA9KuNd6Lk/${index+ 1}.png`}
                         alt=""
                         width="150px"
                         height="150px"
                       />
                       <p className='text-center'><strong>#{index + 1}</strong></p>
-                      <p className='text-center'>Snarf Owned</p>
-                    </div>
+                    </div>                    
                   ))}
                 </div>
+                <p className='text-center'>Your Snarfs</p>
               </div>
             ) : (
               <img src={preview} alt="" width='300' height='300'/>
             )}
-
-
             </Col>
 
             <Col>
@@ -143,6 +147,14 @@ function App() {
                 cost={cost}
                 setIsLoading={setIsLoading}
               />
+              {/* Only show admin controls if the user is the owner */}
+              {account === owner && (
+              <Admin
+                nft={nft}
+                account={account}
+                provider={provider}
+              />
+              )}
             </Col>
 
           </Row>

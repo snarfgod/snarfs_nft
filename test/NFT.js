@@ -67,6 +67,9 @@ describe('NFT', () => {
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
 
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
+
         transaction = await nft.connect(minter).mint(1, { value: COST })
         result = await transaction.wait()
       })
@@ -99,6 +102,9 @@ describe('NFT', () => {
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
 
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
+
         await expect(nft.connect(minter).mint(1, {value: ether(1)})).to.be.reverted
       })
       it('rejects mint outside of allowed minting time', async () => {
@@ -106,6 +112,9 @@ describe('NFT', () => {
 
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
+
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
 
         await expect(nft.connect(minter).mint(1, {value: COST})).to.be.reverted
       })
@@ -115,6 +124,9 @@ describe('NFT', () => {
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
 
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
+
         await expect(nft.connect(minter).mint(0, {value: ether(1)})).to.be.reverted
       })
       it('rejects mint above max supply', async () => {
@@ -122,6 +134,9 @@ describe('NFT', () => {
 
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
+
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
 
         await expect(nft.connect(minter).mint(11, {value: ether(1)})).to.be.reverted
       })
@@ -131,7 +146,22 @@ describe('NFT', () => {
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
 
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
+
         await expect(nft.tokenURI('99')).to.be.reverted
+      })
+      it('rejects if sale is paused', async () => {
+        const ALLOW_MINTING_ON = (Date.now()).toString().slice(0,10)
+
+        const NFT = await ethers.getContractFactory('NFT')
+        nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
+
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
+
+        await nft.connect(deployer).pauseSale()
+        await expect(nft.connect(minter).mint(1, {value: COST})).to.be.reverted
       })
     })
 
@@ -146,6 +176,9 @@ describe('NFT', () => {
 
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
+
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
 
         transaction = await nft.connect(minter).mint(3, {value:ether(30)})
         result = await transaction.wait()
@@ -168,6 +201,9 @@ describe('NFT', () => {
       beforeEach(async () => {
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
+        
+        transaction = await nft.connect(deployer).addtoWhitelist(minter.address)
+        result = await transaction.wait()
 
         transaction = await nft.connect(minter).mint(1, { value: COST })
         result = await transaction.wait()
