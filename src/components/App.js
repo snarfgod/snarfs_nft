@@ -1,125 +1,134 @@
-import {Container} from 'react-bootstrap';
-import {ethers} from 'ethers';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react'
+import { Container, Row, Col } from 'react-bootstrap'
+import Countdown from 'react-countdown'
+import { ethers } from 'ethers'
 
-//Components
+// IMG
+import preview from '../5aabd603b432ce003ef39b982216c1c88b3b5a14.png';
+
+// Components
 import Navigation from './Navigation';
-import Info from './Info';
+import Data from './Data';
+import Mint from './Mint';
 import Loading from './Loading';
-import Buy from './Buy';
-import Progress from './Progress';
-import Time from './Time';
 
-//ABIs
-import TOKEN_ABI from '../abis/Token.json';
-import CROWDSALE_ABI from '../abis/Crowdsale.json';
+// ABIs: Import your contract ABIs here
+import NFT_ABI from '../abis/NFT.json'
 
-//config
+// Config: Import your network config here
 import config from '../config.json';
 
 function App() {
+  const [provider, setProvider] = useState(null)
+  const [nft, setNFT] = useState(null)
 
-    const [account, setAccount] = useState(null)
-    const [accountBalance, setAccountBalance] = useState(null)
-    const [provider, setProvider] = useState(null)
-    const [isLoading, setIsLoading] = useState(true)
-    const [crowdsale, setCrowdsale] = useState(null)
-    const [token, setToken] = useState(null)
+  const [account, setAccount] = useState(null)
 
-    const [price, setPrice] = useState(null)
-    const [maxTokens, setMaxTokens] = useState(null)
-    const [tokensSold, setTokensSold] = useState(null)
-    const [startTime, setStartTime] = useState(0)
-    const [endTime, setEndTime] = useState(0)
-    const [startTimeDate, setStartTimeDate] = useState(null)
-    const [endTimeDate, setEndTimeDate] = useState(null)
+  const [revealTime, setRevealTime] = useState(0)
+  const [maxSupply, setMaxSupply] = useState(0)
+  const [totalSupply, setTotalSupply] = useState(0)
+  const [cost, setCost] = useState(0)
+  const [balance, setBalance] = useState(0)
 
-    const loadBlockchainData = async () => {
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        setProvider(provider)
+  const [isLoading, setIsLoading] = useState(true)
 
-        const token = new ethers.Contract(config[31337].token.address, TOKEN_ABI, provider)
-        const crowdsale = new ethers.Contract(config[31337].crowdsale.address, CROWDSALE_ABI, provider)
-        setToken(token)
-        setCrowdsale(crowdsale)
+  const loadBlockchainData = async () => {
+    // Initiate provider
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    setProvider(provider)
 
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const account = ethers.utils.getAddress(accounts[0])
+    // Initiate contract
+    const nft = new ethers.Contract(config[31337].nft.address, NFT_ABI, provider)
+    setNFT(nft)
 
-        const accountBalance = ethers.utils.formatUnits(await token.balanceOf(account), 18)
-        setAccountBalance(accountBalance)
+    // Fetch accounts
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+    const account = ethers.utils.getAddress(accounts[0])
+    setAccount(account)
 
-        const price = ethers.utils.formatUnits(await crowdsale.price(), 18)
-        setPrice(price)
-        const maxTokens = ethers.utils.formatUnits(await crowdsale.maxTokens(), 18)
-        setMaxTokens(maxTokens)
-        const tokensSold = ethers.utils.formatUnits(await crowdsale.tokensSold(), 18)
-        setTokensSold(tokensSold)
-        setAccount(account)      
+    // Fetch Countdown
+    const allowMintingOn = await nft.allowMintingOn()
+    setRevealTime(allowMintingOn.toString() + '000')
 
-        const startTime = await crowdsale.startTime()
-        setStartTime(startTime)
-        const endTime = await crowdsale.endTime()
-        setEndTime(endTime)
-        
-        const startTimeDate = new Date(startTime * 1000); // Multiply by 1000 to convert from seconds to milliseconds
-        const endTimeDate = new Date(endTime * 1000);
+    // Fetch maxSupply
+    setMaxSupply(await nft.maxSupply())
 
-    // Set the state variables
-        setStartTimeDate(startTimeDate.toUTCString());
-        setEndTimeDate(endTimeDate.toUTCString());
-        setIsLoading(false)  
+    // Fetch totalSupply
+    setTotalSupply(await nft.totalSupply())
+
+    // Fetch cost
+    setCost(await nft.cost())
+
+    // Fetch account balance
+    setBalance(await nft.balanceOf(account))
+
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    if (isLoading) {
+      loadBlockchainData()
     }
+  }, [isLoading]);
 
-    useEffect(() => {
-        if(isLoading) {
-            loadBlockchainData()
-        }
-    }, [isLoading]);
-
-    return(
-        <Container>
-            <Navigation />
-
-            <h1>
-                <p className='text-center my-5'>
-                <strong>Introducing Snarfcoin!</strong>
-                </p>
-            </h1>
-
-            
-            {isLoading ? (
-                <Loading />
-            ):(
-                <>
-                <p className='text-center'>
-                    <strong>Price= </strong>{price} ETH
-                </p>
+  useEffect(() => {
+    if (!isLoading) {
+      console.log(balance.toString());
+    }
+  }, [balance, isLoading]);
 
 
-                <Buy provider={provider} price={price} crowdsale={crowdsale} setIsLoading={setIsLoading} />
+  return(
+    <Container>
+      <Navigation account={account} />
 
-                <Time startTimeDate={startTimeDate} endTimeDate={endTimeDate} startTime={startTime} endTime={endTime}/>
+      <h1 className='my-4 text-center'>Snarfs</h1>
 
-                <p className='text-center my-3'>
-                    <Progress tokensSold={tokensSold} maxTokens={maxTokens}/>
-                </p>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <>
+          <Row>
+            <Col>
+              {balance > 0 ? (
+                <div className='text-center'>
+                  <img
+                    src={`https://gateway.pinata.cloud/ipfs/QmasBfFE6yQQH2y4SHfk5bTNm5iQiNSuMhyXxA9KuNd6Lk/${balance.toString()}.png`}
+                    alt=""
+                    width="400px"
+                    height="400px"
+                  />
+                </div>
+              ) : (
+                <img src={preview} alt="" width='300' height='300'/>
+              )}
+            </Col>
 
-                <p className='text-center my-3'>
-                    {tokensSold} / {maxTokens} Tokens Sold
-                </p>
-                </>                
-            )}
+            <Col>
+              <div className='my-4 text-center'>
+                <Countdown date={parseInt(revealTime)} className='h2' />
+              </div>
 
-            
-            <hr />
-            {account && (
-                <Info account={account} accountBalance={accountBalance}/>
+              <Data
+                maxSupply={maxSupply}
+                totalSupply={totalSupply}
+                cost={cost}
+                balance={balance}
+              />
 
-            )}
-            
-        </Container>
-    )
+              <Mint
+                provider={provider}
+                nft={nft}
+                cost={cost}
+                setIsLoading={setIsLoading}
+              />
+            </Col>
+
+          </Row>
+        </>
+      )}
+    </Container>
+  )
 }
 
 export default App;

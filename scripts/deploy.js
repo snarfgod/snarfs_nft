@@ -11,9 +11,8 @@ async function main() {
   const SYMBOL = 'SN'
   const COST = ethers.utils.parseUnits('10', 'ether')
   const MAX_SUPPLY = 10
-  const BASE_URI = 'ipfs://QmUM7Ng6roZNXSpP9e31JTy54XzJzfpfCMRs8P1E9g9ZLP/'
   const ALLOW_MINTING_ON = (Date.now() + 60000).toString().slice(0,10)
-  const IPFS_METADATA_URI = 'ipfs://QmUM7Ng6roZNXSpP9e31JTy54XzJzfpfCMRs8P1E9g9ZLP/'
+  const IPFS_METADATA_URI = 'ipfs://QmfQy76wozSS27gVKSTEQGRqUkqNBytvcu77MYwsnavNE1/'
 
   const NFT = await ethers.getContractFactory('NFT')
   nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, IPFS_METADATA_URI)
