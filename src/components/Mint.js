@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { ethers } from 'ethers';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -7,6 +8,10 @@ import Spinner from 'react-bootstrap/Spinner';
 const Mint = ({ provider, nft, cost, setIsLoading }) => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [numNFTs, setNumNFTs] = useState(1);
+
+  useEffect(() => {
+    setIsLoading(false); // Reset loading state after transaction is confirmed
+  }, [numNFTs, setIsLoading]);
 
   const mintHandler = async (e) => {
     e.preventDefault();
