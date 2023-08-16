@@ -35,11 +35,9 @@ describe('NFT', () => {
     it('has correct name', async () => {
       expect(await nft.name()).to.equal(NAME)
     })
-
     it('has correct symbol', async () => {
       expect(await nft.symbol()).to.equal(SYMBOL)
     })
-
     it('has correct cost', async () => {
       expect(await nft.cost()).to.equal(COST)
     })
@@ -69,7 +67,7 @@ describe('NFT', () => {
         const NFT = await ethers.getContractFactory('NFT')
         nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
 
-        transaction = await nft.connect(minter).mint(1, {value: COST})
+        transaction = await nft.connect(minter).mint(1, { value: COST })
         result = await transaction.wait()
       })
 
@@ -162,12 +160,45 @@ describe('NFT', () => {
     })
   })
 
-  describe('Minting', () => {
+  describe('Withdraws', () => {
 
     describe('Success', async () => {
+      const ALLOW_MINTING_ON = (Date.now()).toString().slice(0,10)
+
+      beforeEach(async () => {
+        const NFT = await ethers.getContractFactory('NFT')
+        nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
+
+        transaction = await nft.connect(minter).mint(1, { value: COST })
+        result = await transaction.wait()
+
+        transaction = await nft.connect(deployer).withdraw()
+        result = await transaction.wait()
+      })
+      it('deducts contract balance', async () => {
+        expect(await ethers.provider.getBalance(nft.address)).to.equal(0)
+      })
+      it('sends funds to the owner', async () => {
+        expect(await ethers.provider.getBalance(deployer.address)).to.be.greaterThan(COST)
+      })
+      it('emits correct Withdraw event', async () => {
+        await expect(transaction).to.emit(nft, 'Withdraw').withArgs(COST, deployer.address)
+      })
     })
 
     describe('Failure', async () => {
+    })
+  })
+  describe('Price changes', () => {
+    beforeEach(async () => {
+      const ALLOW_MINTING_ON = (Date.now()).toString().slice(0,10)
+
+      const NFT = await ethers.getContractFactory('NFT')
+      nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI)
+    })
+    it('updates price', async () => {
+      await nft.connect(deployer).setCost(ether(20))
+      expect(await nft.cost()).to.equal(ether(20))
     })
   })
 })
