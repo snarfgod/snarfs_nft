@@ -90,20 +90,39 @@ function App() {
         <>
           <Row>
             <Col>
-              {balance > 0 ? (
-                <div className='text-center'>
-                  <img
-                    src={`https://gateway.pinata.cloud/ipfs/QmasBfFE6yQQH2y4SHfk5bTNm5iQiNSuMhyXxA9KuNd6Lk/${balance.toString()}.png`}
-                    alt=""
-                    width="400px"
-                    height="400px"
-                  />
-                  <p className='text-center'><strong>#{balance.toString()}</strong></p>
-                </div>
+            {balance > 0 ? (
+              <div className='text-center d-flex flex-column align-items-center'>
+                {/* Display the most recent NFT as the largest */}
+                <img
+                  src={`https://gateway.pinata.cloud/ipfs/QmasBfFE6yQQH2y4SHfk5bTNm5iQiNSuMhyXxA9KuNd6Lk/${balance.toString()}.png`}
+                  alt=""
+                  width="400px"
+                  height="400px"
+                />
+                <p className='text-center'><strong>#{balance.toString()}</strong></p>
+                <p className='text-center'>Most Recent Snarf Owned</p>
                 
-              ) : (
-                <img src={preview} alt="" width='300' height='300'/>
-              )}
+                {/* Display the rest of the owned NFTs side by side */}
+                <div className='d-flex mt-4'>
+                  {Array.from({ length: balance - 1 }).map((_, index) => (
+                    <div key={index} className='d-flex flex-column align-items-center'>
+                      <img
+                        src={`https://gateway.pinata.cloud/ipfs/QmasBfFE6yQQH2y4SHfk5bTNm5iQiNSuMhyXxA9KuNd6Lk/${index + 1}.png`}
+                        alt=""
+                        width="150px"
+                        height="150px"
+                      />
+                      <p className='text-center'><strong>#{index + 1}</strong></p>
+                      <p className='text-center'>Snarf Owned</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <img src={preview} alt="" width='300' height='300'/>
+            )}
+
+
             </Col>
 
             <Col>
