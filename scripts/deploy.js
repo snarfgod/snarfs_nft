@@ -7,31 +7,19 @@
 const hre = require("hardhat");
 
 async function main() {
-    const NAME = 'Snarfcoin';
-    const SYMBOL = 'SNARF';
-    const MAX_SUPPLY = ethers.utils.parseUnits('1000000', 'ether');
-    const PRICE = ethers.utils.parseUnits('.025', 'ether');
-    
-    const Token = await hre.ethers.getContractFactory("Token");
-    let token = await Token.deploy(NAME, SYMBOL, MAX_SUPPLY);
+  const NAME = 'Snarfs'
+  const SYMBOL = 'SN'
+  const COST = ethers.utils.parseUnits('10', 'ether')
+  const MAX_SUPPLY = 10
+  const BASE_URI = 'ipfs://QmUM7Ng6roZNXSpP9e31JTy54XzJzfpfCMRs8P1E9g9ZLP/'
+  const ALLOW_MINTING_ON = (Date.now() + 60000).toString().slice(0,10)
+  const IPFS_METADATA_URI = 'ipfs://QmUM7Ng6roZNXSpP9e31JTy54XzJzfpfCMRs8P1E9g9ZLP/'
 
-    await token.deployed();
-    console.log("Token deployed to:", token.address);
+  const NFT = await ethers.getContractFactory('NFT')
+  nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, IPFS_METADATA_URI)
 
-    const Crowdsale = await hre.ethers.getContractFactory("Crowdsale");
-    let crowdsale = await Crowdsale.deploy(token.address, PRICE, MAX_SUPPLY);
-    await crowdsale.deployed();
-    console.log("Crowdsale deployed to:", crowdsale.address);
-
-    const transaction = await token.transfer(crowdsale.address, MAX_SUPPLY);
-    await transaction.wait();
-    console.log("Transfered tokens to crowdsale");
-
-    const addingToWhitelist = await crowdsale.addToWhitelist('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266')
-    await addingToWhitelist.wait();
-    const addingOwner = await crowdsale.addToWhitelist('0x70997970C51812dc3A010C7d01b50e0d17dc79C8');
-    await addingOwner.wait()
-    console.log("Added deployer and user1 to whitelist");
+  await nft.deployed();
+  console.log("NFT deployed to:", nft.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
